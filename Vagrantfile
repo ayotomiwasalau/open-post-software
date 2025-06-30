@@ -8,9 +8,9 @@ Vagrant.configure("2") do |config|
     inline: "sudo su - && zypper update && zypper install -y apparmor-parser"
   
   # Set the image for the vagrant box
-  config.vm.box = "opensuse/Leap-15.2.x86_64"
+  config.vm.box = "suse/sles-15-sp4"
   # Set the image version
-  config.vm.box_version = "15.2.31.632"
+  # config.vm.box_version = "15.2.31.632"
   config.vm.synced_folder "./", "/vagrant"
 
   # Forward the ports from the guest VM to the local host machine
