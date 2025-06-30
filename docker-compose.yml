@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    build: 
+      context: ./techtrends/db
+      args:
+        DB_USERNAME: ${DB_USERNAME:-postgres}
+        DB_PASSWORD: ${DB_PASSWORD:-password}
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  app:
+    build: ./techtrends/appserver
+    environment:
+      DB_HOST: db
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      DB_PORT: 5432
+      DB_NAME: postgres
+    ports:
+      - "3111:3111"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge 

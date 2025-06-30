@@ -1,0 +1,2 @@
+INSERT INTO posts (title, name, content) VALUES ('2020 CNCF Annual Report', 'joe', 'The Cloud Native Computing Foundation (CNCF) annual report for 2020 is now available. The report highlights the growth of the community, events, projects, and more, over the past year.');
+INSERT INTO posts (title, name, content) VALUES ('2020 CNCF Annual Report', 'jane', 'The Cloud Native Computing Foundation (CNCF) annual report for 2020 is now available. The report highlights the growth of the community, events, projects, and more, over the past year.');

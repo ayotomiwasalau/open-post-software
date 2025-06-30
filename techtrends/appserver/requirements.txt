@@ -1,0 +1,5 @@
+Flask
+werkzeug
+itsdangerous
+flask-sqlalchemy
+psycopg2-binary
