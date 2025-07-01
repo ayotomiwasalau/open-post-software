@@ -1,7 +1,7 @@
 # set up the default terminal
 ENV["TERM"]="linux"
 
-# set minimum version for Vagrant - sync check
+# set minimum version for Vagrant
 Vagrant.require_version ">= 2.2.10"
 Vagrant.configure("2") do |config|
   config.vm.provision "shell",
