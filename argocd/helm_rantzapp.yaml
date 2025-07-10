@@ -14,5 +14,5 @@ spec:
         - values.yaml
     # path to the folder with the YAML manifests
     path: helm
-    repoURL: https://github.com/ayotomiwasalau/full-cloud-native-app
+    repoURL: https://github.com/ayotomiwasalau/open-post-software
     targetRevision: HEAD
