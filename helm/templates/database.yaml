@@ -5,15 +5,15 @@ metadata:
   labels:
     type: local
     app: app-db
-  namespace: dev
+  namespace: {{ .Values.namespace.name }}
 spec:
   storageClassName: manual
   capacity:
-    storage: 256Mi
+    storage: {{ .Values.database.storage.capacity }}
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: "/mnt/data"
+    path: {{ .Values.database.storage.hostPath }}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -21,14 +21,14 @@ metadata:
   name: postgres-pv-claim
   labels:
     app: app-db
-  namespace: dev
+  namespace: {{ .Values.namespace.name }}
 spec:
   storageClassName: manual
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 256Mi
+      storage: {{ .Values.database.storage.capacity }}
 ---
 apiVersion: v1
 kind: Service
@@ -36,22 +36,22 @@ metadata:
   name: app-db
   labels:
     app: app-db
-  namespace: dev
+  namespace: {{ .Values.namespace.name }}
 spec:
   type: NodePort
   selector:
     app: app-db
   ports:
-   - port: 5432
-     targetPort: 5432
+   - port: {{ .Values.database.port }}
+     targetPort: {{ .Values.database.port }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: app-db
-  namespace: dev
+  namespace: {{ .Values.namespace.name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.database.replicaCount }}
   selector:
     matchLabels:
       app: app-db
@@ -62,10 +62,10 @@ spec:
     spec:
       containers:
         - name: app-db
-          image: tomiwasalau01/app-db:latest
-          imagePullPolicy: "IfNotPresent"
+          image: {{ .Values.database.image.repository }}:{{ .Values.database.image.tag }}
+          imagePullPolicy: {{ .Values.database.image.pullPolicy }}
           ports:
-            - containerPort: 5432
+            - containerPort: {{ .Values.database.port }}
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgresdb
@@ -88,4 +88,4 @@ spec:
       volumes:
         - name: postgresdb
           persistentVolumeClaim:
-            claimName: postgres-pv-claim
+            claimName: postgres-pv-claim   

@@ -1,16 +1,16 @@
 namespace:
-  name: sandbox
+  name: dev
  
 service:
-  port: 4111
+  port: 3111
   targetPort: 3111
   protocol: TCP
-  type: ClusterIP
+  type: NodePort
 
 image:
-  repository: tomiwasalau01/techtrends 
-  tag: v2.0.0
-  pullPolicy: IfNotPresent
+  repository: tomiwasalau01/appserver
+  tag: latest
+  pullPolicy: Always
 
 replicaCount: 1
 
@@ -30,9 +30,31 @@ livenessProbe:
   httpGet:
     path: /healthz
     port: 3111
+  initialDelaySeconds: 5
+  timeoutSeconds: 2
 
 readinessProbe:
   httpGet:
     path: /healthz
     port: 3111
+  initialDelaySeconds: 5
+  timeoutSeconds: 5
+
+database:
+  replicaCount: 1
+  port: 5432
+  image:
+    repository: tomiwasalau01/app-db
+    tag: latest
+    pullPolicy: IfNotPresent
+  storage:
+    capacity: 256Mi
+    hostPath: "/mnt/data"
+  config:
+    username: "admin"
+    name: "postgres"
+    host: "postgres"
+    port: "5432"
+  secret:
+    password: "d293aW1zb3NlY3VyZQ=="
 

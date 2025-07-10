@@ -5,3 +5,18 @@ As a platform engineer, The goal of these project is to package and deploy TechT
 Tool like Helms, Github actions, ArgoCD and Docker were used.
 
 Refer to the `argocd` folder for the argo deployment yaml, ``helm`` for the charts and manifests and ``kubenetes`` for the components defintitions. ``techtrends`` contains the Docker file and the flask application that was deployed.
+
+
+#TODO
+once pods are running
+deploy app using manifest on vagrant
+deploy app using using helm and argo cd on vagrant
+deploy monitoring tools
+
+set up infra terraform for aws using ec2 and co
+setup app deployment to ec2
+setup monitoring deployment to ec2
+
+setup ci for infra
+setup ci for application
+setup ci for monitoring
