@@ -8,10 +8,11 @@ Refer to the `argocd` folder for the argo deployment yaml, ``helm`` for the char
 
 
 #TODO
-once pods are running
-deploy app using manifest on vagrant
-deploy app using using helm and argo cd on vagrant
-deploy monitoring tools
+once pods are running - done
+deploy app using manifest on vagrant - done
+
+deploy app using using helm and argo cd on vagrant - done
+deploy monitoring tools - prometheus, grafana, falco, jaeger, sentry, X loki
 
 set up infra terraform for aws using ec2 and co
 setup app deployment to ec2
