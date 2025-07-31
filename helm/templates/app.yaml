@@ -36,6 +36,8 @@ spec:
       creationTimestamp: null
       labels:
         app: app-server
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: "true"
     spec:
       containers:
       - image: {{ .Values.image.repository }}:{{ .Values.image.tag }}

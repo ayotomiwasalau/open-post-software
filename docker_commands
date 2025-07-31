@@ -5,7 +5,7 @@ docker build -t speak-db .
 
 docker run -e DB_USERNAME=<DB_USERNAME> -e DB_PASSWORD=<DB_PASSWORD> -p 5151:5151 <CONTAINER_NAME>
 
-docker build -t tomiwasalau01/appserver .
+- docker build -t tomiwasalau01/appserver .
 
 docker build --build-arg DB_USERNAME=tomdb --build-arg DB_PASSWORD=tompassword  -t tomiwasalau01/appserver .
 

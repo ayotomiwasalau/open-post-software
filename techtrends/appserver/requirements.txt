@@ -3,3 +3,5 @@ werkzeug
 itsdangerous
 flask-sqlalchemy
 psycopg2-binary
+opentelemetry-distro
+opentelemetry-exporter-otlp

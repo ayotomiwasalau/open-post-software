@@ -23,3 +23,13 @@ helm install otel-collector open-telemetry/opentelemetry-collector \
 kubectl port-forward svc/otel-collector-opentelemetry-collector  --address 0.0.0.0 4317:4317 -n observability --kubeconfig /etc/rancher/k3s/k3s.yaml
 
 kubectl port-forward svc/jaeger-query --address 0.0.0.0 16686:16686 -n observability --kubeconfig /etc/rancher/k3s/k3s.yaml
+
+pip install opentelemetry-distro opentelemetry-exporter-otlp
+opentelemetry-bootstrap -a install
+
+opentelemetry-instrument \ 
+    --traces_exporter console \
+    --metrics_exporter console \
+    --logs_exporter console \
+    --service_name rantzapp \
+    flask run -p 3111
