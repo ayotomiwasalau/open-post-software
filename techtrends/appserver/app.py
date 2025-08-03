@@ -24,7 +24,7 @@ tracer = trace.get_tracer(__name__)
 
 # Replace JaegerExporter with OTLPSpanExporter
 otlp_exporter = OTLPSpanExporter(
-    endpoint="http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317",
+    endpoint="http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4318",
     insecure=True
 )
 
@@ -144,4 +144,3 @@ def metrics():
 if __name__ == "__main__":
    app.run(host='0.0.0.0', port='3111', debug=True)
 
-FlaskInstrumentor().uninstrument_app(app)

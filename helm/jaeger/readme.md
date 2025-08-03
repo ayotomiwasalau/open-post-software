@@ -20,9 +20,15 @@ helm install otel-collector open-telemetry/opentelemetry-collector \
     --set image.repository="otel/opentelemetry-collector-k8s"\
     --kubeconfig /etc/rancher/k3s/k3s.yaml
 
-kubectl port-forward svc/otel-collector-opentelemetry-collector  --address 0.0.0.0 4317:4317 -n observability --kubeconfig /etc/rancher/k3s/k3s.yaml
+helm upgrade otel-collector open-telemetry/opentelemetry-collector \
+    --namespace observability \
+    --values otel-collector.yaml \
+    --set image.repository="otel/opentelemetry-collector-k8s" \
+    --kubeconfig /etc/rancher/k3s/k3s.yaml
 
-kubectl port-forward svc/jaeger-query --address 0.0.0.0 16686:16686 -n observability --kubeconfig /etc/rancher/k3s/k3s.yaml
+kubectl port-forward svc/otel-collector-opentelemetry-collector  --address 0.0.0.0 4317:4317 -n observability --kubeconfig /etc/rancher/k3s/k3s.yaml &
+
+kubectl port-forward svc/jaeger-query --address 0.0.0.0 16686:16686 -n observability --kubeconfig /etc/rancher/k3s/k3s.yaml &
 
 pip install opentelemetry-distro opentelemetry-exporter-otlp
 opentelemetry-bootstrap -a install

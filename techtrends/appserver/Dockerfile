@@ -14,7 +14,7 @@ RUN pip install -r requirements.txt
 ENV OTEL_SERVICE_NAME=rantzapp
 ENV OTEL_SERVICE_VERSION=1.0.0
 ENV OTEL_RESOURCE_ATTRIBUTES=service.name=rantzapp,service.version=1.0.0
-ENV OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317
+# ENV OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317
 
 EXPOSE 3111 
 
