@@ -3,6 +3,13 @@ from werkzeug.exceptions import abort
 import logging
 import sys
 import os
+import uuid
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
 
 # Add current directory to Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -10,6 +17,25 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # Import PostgreSQL configuration and models
 from config import app, db
 from models import posts
+
+# Configure tracing
+trace.set_tracer_provider(TracerProvider())
+tracer = trace.get_tracer(__name__)
+
+# Replace JaegerExporter with OTLPSpanExporter
+otlp_exporter = OTLPSpanExporter(
+    endpoint="http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317",
+    insecure=True
+)
+
+# Configure the trace processor
+span_processor = BatchSpanProcessor(otlp_exporter)
+trace.get_tracer_provider().add_span_processor(span_processor)
+
+# Instrument Flask
+FlaskInstrumentor().instrument_app(app)
+SQLite3Instrumentor().instrument()
+
 
 #connection count
 db_connection_count = 0
@@ -49,9 +75,12 @@ configure_logging()
 # Define the main route of the web application 
 @app.route('/')
 def index():
-    all_posts = posts.query.order_by(posts.created.desc()).all()
-    logging.info("The homepage has been retrieved.")
-    return render_template('index.html', posts=all_posts)
+    with trace.get_tracer(__name__).start_as_current_span("home-page") as span:
+        all_posts = posts.query.order_by(posts.created.desc()).all()
+        tracking_id = str(uuid.uuid4())
+        span.set_attribute("tracking_id", tracking_id)
+        logging.info("The homepage has been retrieved.")
+        return render_template('index.html', posts=all_posts)
 
 # Define how each individual article is rendered 
 # If the post ID is not found a 404 page is shown
@@ -114,3 +143,5 @@ def metrics():
 # start the application on port 3111
 if __name__ == "__main__":
    app.run(host='0.0.0.0', port='3111', debug=True)
+
+FlaskInstrumentor().uninstrument_app(app)

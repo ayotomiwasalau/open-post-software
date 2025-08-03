@@ -1,8 +1,10 @@
 mode: "deployment"
 config:
   exporters:
+    # oltp:
+    #   endpoint: jaeger.observability.svc.cluster.local:14250 #jaeger-collector:4317
     otlp:
-      endpoint: jaeger.observability.svc.cluster.local:14250 #jaeger-collector:4317
+      endpoint: jaeger-collector:4317 #jaeger-collector.observability.svc.cluster.local:14250 
       tls:
         insecure: true
   extensions:
