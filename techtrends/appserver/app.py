@@ -10,6 +10,8 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
+from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
+from opentelemetry.sdk.resources import Resource
 
 # Add current directory to Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -18,13 +20,20 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from config import app, db
 from models import posts
 
-# Configure tracing
-trace.set_tracer_provider(TracerProvider())
+# Configure tracing with proper resource attributes
+resource = Resource.create({
+    "service.name": os.getenv("OTEL_SERVICE_NAME", "rantzapp"),
+    "service.version": os.getenv("OTEL_SERVICE_VERSION", "1.0.0"),
+    "service.instance.id": str(uuid.uuid4())
+})
+
+trace.set_tracer_provider(TracerProvider(resource=resource))
 tracer = trace.get_tracer(__name__)
 
-# Replace JaegerExporter with OTLPSpanExporter
+# Configure OTLP exporter with proper endpoint
+otlp_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317")
 otlp_exporter = OTLPSpanExporter(
-    endpoint="http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4318",
+    endpoint=otlp_endpoint,
     insecure=True
 )
 
@@ -32,9 +41,10 @@ otlp_exporter = OTLPSpanExporter(
 span_processor = BatchSpanProcessor(otlp_exporter)
 trace.get_tracer_provider().add_span_processor(span_processor)
 
-# Instrument Flask
+# Instrument Flask and database
 FlaskInstrumentor().instrument_app(app)
 SQLite3Instrumentor().instrument()
+Psycopg2Instrumentor().instrument()
 
 
 #connection count

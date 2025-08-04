@@ -9,3 +9,5 @@ opentelemetry-exporter-otlp-proto-grpc
 opentelemetry-instrumentation-flask
 opentelemetry-instrumentation-sqlite3
 opentelemetry-instrumentation-logging
+opentelemetry-instrumentation-psycopg2
+opentelemetry-instrumentation-requests

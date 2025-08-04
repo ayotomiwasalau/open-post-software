@@ -82,6 +82,21 @@ spec:
             configMapKeyRef:
               name: db-env
               key: DB_NAME
+        # OpenTelemetry environment variables for tracing
+        - name: OTEL_SERVICE_NAME
+          value: "rantzapp"
+        - name: OTEL_SERVICE_VERSION
+          value: "1.0.0"
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.name=rantzapp,service.version=1.0.0"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317"
+        - name: OTEL_EXPORTER_OTLP_PROTOCOL
+          value: "grpc"
+        - name: OTEL_TRACES_SAMPLER
+          value: "always_on"
+        - name: OTEL_TRACES_SAMPLER_ARG
+          value: "1.0"
               
         resources:
           requests:
