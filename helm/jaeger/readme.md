@@ -4,9 +4,9 @@ kubectl create ns observability
 helm upgrade --install jaeger jaegertracing/jaeger \
     --namespace observability \
     --create-namespace \
-    --history-max 2 \
     --values jaeger-values.yaml \
     --kubeconfig /etc/rancher/k3s/k3s.yaml
+    --history-max 2 \
 
 helm upgrade --install jaeger jaegertracing/jaeger  -n observability   --set storage.type=memory  --set provisionDataStore.cassandra=false --kubeconfig /etc/rancher/k3s/k3s.yaml
 helm upgrade --uninstall jaeger jaegertracing/jaeger  -n observability   --kubeconfig /etc/rancher/k3s/k3s.yaml

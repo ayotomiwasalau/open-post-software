@@ -29,3 +29,13 @@ helm repo add falcosecurity https://falcosecurity.github.io/charts
 helm repo update
 ## Falco deployment
 helm install --kubeconfig kube_config_cluster.yml falco falcosecurity/falco --namespace falco --create-namespace --set falco.grpc.enabled=true --set falco.grpc_output.enabled=true
+
+kubectl  exec --stdin -it falco-wpnvg --namespace falco -- /bin/sh
+
+helm install --kubeconfig /etc/rancher/k3s/k3s.yaml falco-exporter --namespace falco --set serviceMonitor.enabled=true falcosecurity/falco-exporter
+
+kubectl port-forward service/falco-exporter --address 0.0.0.0 9376:9376 --namespace falco 
+kubectl port-forward service/prometheus-kube-prometheus-prometheus --address 0.0.0.0 9090:9090 --namespace monitoring &
+
+kubectl apply -f falco_service_monitor.yaml
+kubectl edit --kubeconfig /etc/rancher/k3s/k3s.yaml prometheus -n monitoring

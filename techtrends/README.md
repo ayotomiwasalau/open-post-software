@@ -12,6 +12,8 @@ To run this application there are 2 steps required:
 kubectl port-forward service/app-server --address 0.0.0.0 3111:3111 --namespace dev &
 kubectl port-forward service/app-db --address 0.0.0.0 5432:5432 --namespace dev
 
+ 
+kubectl port-forward service/argocd-server-nodeport --address 0.0.0.0 30008:30008 --namespace argocd
 
 
 PASSWORD=$(kubectl get secret db-secret \

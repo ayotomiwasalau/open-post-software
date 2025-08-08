@@ -1,14 +1,14 @@
 mode: "deployment"
 config:
   exporters:
-    # Export traces to Jaeger using the jaeger exporter
-    jaeger:
-      endpoint: jaeger-collector.observability.svc.cluster.local:14250
+    # Export traces to Jaeger using OTLP exporter
+    otlp:
+      endpoint: jaeger-collector.observability.svc.cluster.local:4317
       tls:
         insecure: true
-    # Optional: Keep console exporter for debugging
-    logging:
-      loglevel: debug
+    # Debug exporter for troubleshooting
+    debug:
+      verbosity: detailed
 
   extensions:
     health_check:
@@ -34,4 +34,4 @@ config:
       traces:
         receivers: [otlp]
         processors: [batch]
-        exporters: [jaeger, logging]
+        exporters: [otlp, debug]

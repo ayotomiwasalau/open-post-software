@@ -12,7 +12,7 @@ once pods are running - done
 deploy app using manifest on vagrant - done
 
 deploy app using using helm and argo cd on vagrant - done
-deploy monitoring tools - prometheus, grafana, falco, jaeger, sentry, X loki
+deploy monitoring tools - prometheus, grafana, jaeger, falco, --- sentry, X loki
 
 set up infra terraform for aws using ec2 and co
 setup app deployment to ec2
