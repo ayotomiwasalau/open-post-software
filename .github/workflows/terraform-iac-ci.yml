@@ -77,9 +77,9 @@ jobs:
       run: terraform destroy -auto-approve
       if: github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.inputs.action == 'destroy'
       
-    - name: Upload Terraform Plan
-      uses: actions/upload-artifact@v3
-      with:
-        name: terraform-plan
-        path: ${{ env.TF_WORKING_DIR }}/tfplan
-      # if: github.event_name == 'pull_request'
+    # - name: Upload Terraform Plan
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: terraform-plan
+    #     path: ${{ env.TF_WORKING_DIR }}/tfplan
+    #   # if: github.event_name == 'pull_request'
