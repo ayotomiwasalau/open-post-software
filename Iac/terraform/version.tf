@@ -16,7 +16,7 @@ terraform {
   
   backend "s3" {
     bucket = "deploy-artifacts-aytom"
-    key    = "terraform/terraform.tfstate"
+    key    = "terraform.tfstate"
     region = "eu-west-1"
   }
 }
