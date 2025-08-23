@@ -463,5 +463,5 @@ resource "aws_lb_listener" "main" {
 # Create a key pair
 resource "aws_key_pair" "main" {
   key_name   = "ec2-kp"
-  public_key = file("${path.module}/ec2-kp.pub")  # You'll need the public key
+  # public_key = file("${path.module}/ec2-kp.pub")  # You'll need the public key
 }
