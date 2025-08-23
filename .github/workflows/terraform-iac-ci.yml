@@ -23,6 +23,7 @@ on:
 env:
   TF_VERSION: "1.12.2"
   TF_WORKING_DIR: "./Iac/terraform"
+  TF_VAR_ec2_public_key: ${{ secrets.EC2_PUBLIC_KEY }}
 
 jobs:
   terraform:
@@ -64,7 +65,7 @@ jobs:
       
     - name: Terraform Apply
       working-directory: ${{ env.TF_WORKING_DIR }}
-      run: terraform apply -auto-approve tfplan
+      run: terraform apply --auto-approve tfplan
       if: github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.inputs.action == 'apply'
       
     - name: Terraform Destroy
