@@ -1,4 +1,3 @@
-.github
 .vagrant
 **/__pycache__/**
 ec2-kp.pem
