@@ -66,7 +66,7 @@ jobs:
     - name: Terraform Apply
       working-directory: ${{ env.TF_WORKING_DIR }}
       run: terraform apply --auto-approve tfplan
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.inputs.action == 'apply'
+      if: github.ref == 'refs/heads/main' && github.event.inputs.action == 'apply'
       
     - name: Terraform Destroy
       working-directory: ${{ env.TF_WORKING_DIR }}
