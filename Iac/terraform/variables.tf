@@ -23,3 +23,9 @@ variable "aws_profile" {
   description = "AWS profile to use for authentication"
   default     = "manager"
 }
+
+variable "ec2_public_key" {
+  description = "Public key for EC2 instances"
+  type        = string
+  sensitive   = true
+}
