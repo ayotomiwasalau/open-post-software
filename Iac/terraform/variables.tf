@@ -17,3 +17,9 @@ variable "private_az" {
   description = "Change this to a letter a-f only if you encounter an error during setup"
   default     = "b"
 }
+
+variable "aws_profile" {
+  type        = string
+  description = "AWS profile to use for authentication"
+  default     = "manager"
+}

@@ -1,9 +1,0 @@
-apiVersion: v1
-name: rants-app 
-description: Deploy a python rant app
-keywords:
-- rantzapp
-version: 1.0.0
-maintainers:
-- name: ayotomiwasalau 
-  email: ayotomiwasalau@gmail.com

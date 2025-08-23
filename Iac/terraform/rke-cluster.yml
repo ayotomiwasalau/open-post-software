@@ -1,0 +1,49 @@
+nodes:
+# Control Plane + etcd nodes (first 2 nodes)
+- address: 54.78.246.240
+  internal_address: 10.0.3.230
+  user: ec2-user
+  role: [controlplane, etcd, worker]
+  ssh_key_path: ./ec2-kp.pem
+
+- address: 3.249.10.21
+  internal_address: 10.0.2.211
+  user: ec2-user
+  role: [controlplane, etcd, worker]
+  ssh_key_path: ./ec2-kp.pem
+
+services:
+  etcd:
+    snapshot: true
+    creation: 6h
+    retention: 24h
+
+network:
+  plugin: canal
+  options:
+    canal_flannel_backend_type: vxlan
+
+authentication:
+  strategy: x509
+
+authorization:
+  mode: rbac
+
+ignore_docker_version: false
+
+kubernetes_version: v1.24.10-rancher4-1
+
+cluster_name: rantzapp-cluster
+
+private_registries:
+- url: index.docker.io
+  user: ""
+  password: ""
+  is_default: true
+
+# High availability settings
+control_plane:
+  max_pods: 110
+
+worker:
+  max_pods: 110

@@ -27,7 +27,7 @@ data "aws_availability_zones" "available" {
 
 # Create public subnets in only 2 availability zones
 resource "aws_subnet" "public_subnets" {
-  count                   = 2
+  count                   = length(data.aws_availability_zones.available.names)
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.${count.index + 1}.0/24"
   availability_zone       = data.aws_availability_zones.available.names[count.index]
@@ -93,6 +93,87 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Kubernetes API Server
+  ingress {
+    description = "Kubernetes API Server"
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Kubelet API
+  ingress {
+    description = "Kubelet API"
+    from_port   = 10250
+    to_port     = 10250
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Kube Scheduler
+  ingress {
+    description = "Kube Scheduler"
+    from_port   = 10251
+    to_port     = 10251
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Kube Controller Manager
+  ingress {
+    description = "Kube Controller Manager"
+    from_port   = 10252
+    to_port     = 10252
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # etcd client communication
+  ingress {
+    description = "etcd client communication"
+    from_port   = 2379
+    to_port     = 2379
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # etcd peer communication
+  ingress {
+    description = "etcd peer communication"
+    from_port   = 2380
+    to_port     = 2380
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Canal/Flannel VXLAN overlay networking
+  ingress {
+    description = "Canal/Flannel VXLAN overlay networking"
+    from_port   = 8472
+    to_port     = 8472
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Canal/Flannel health check
+  ingress {
+    description = "Canal/Flannel health check"
+    from_port   = 9099
+    to_port     = 9099
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # NodePort Services
+  ingress {
+    description = "NodePort Services"
+    from_port   = 30000
+    to_port     = 32767
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -137,6 +218,17 @@ resource "aws_iam_role_policy_attachment" "ec2_cloudwatch_policy" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
+# Additional policies for RKE
+resource "aws_iam_role_policy_attachment" "ec2_ecr_policy" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_eks_policy" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+}
+
 # Create instance profile
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "rantzapp-ec2-profile"
@@ -146,22 +238,38 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 ###################
 # Launch Template
 ###################
-# Get latest Amazon Linux 2 AMI
-data "aws_ami" "amazon_linux" {
+# Get latest openSUSE Leap 15.6 AMI
+data "aws_ami" "opensuse_leap" {
   most_recent = true
-  owners      = ["amazon"]
+  owners      = ["679593333241"]  # openSUSE official account
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+    values = ["openSUSE-Leap-15.6-*"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
   }
 }
 
 # Create launch template
 resource "aws_launch_template" "main" {
   name_prefix   = "rantzapp-lt"
-  image_id      = data.aws_ami.amazon_linux.id
-  instance_type = "t3.micro"
+  image_id      = data.aws_ami.opensuse_leap.id
+  instance_type = "t3.large"
+  key_name      = aws_key_pair.main.key_name
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_profile.name
   }
@@ -173,11 +281,68 @@ resource "aws_launch_template" "main" {
 
   user_data = base64encode(<<-EOF
               #!/bin/bash
-              yum update -y
-              yum install -y httpd
-              systemctl start httpd
-              systemctl enable httpd
-                             echo "<h1>Hello from RantzApp!</h1>" > /var/www/html/index.html
+              
+              # Update system
+              zypper refresh
+              zypper update -y
+              
+              # Install Docker
+              zypper install -y docker
+
+              #To avoid using ingore docker true, but doesnt always work
+              #----------------------------------------------
+              #zypper remove -y docker docker-compose
+              # Add Docker repository for supported version
+              #zypper addrepo https://download.docker.com/linux/opensuse/docker-ce.repo
+              # Install specific Docker version (20.10.x is supported)
+              #zypper install -y docker-ce-20.10.24 docker-ce-cli-20.10.24 containerd.io
+              #-----------------------------------------------
+
+              # Start and enable Docker
+              systemctl start docker
+              systemctl enable docker
+              
+              # Add user to docker group
+              usermod -aG docker ec2-user
+              
+              # Install required packages
+              zypper install -y curl wget git
+              
+              # Download and install RKE binary
+              curl -LO https://github.com/rancher/rke/releases/latest/download/rke_linux-amd64
+              chmod +x rke_linux-amd64
+              mv rke_linux-amd64 /usr/local/bin/rke
+              
+              # Create RKE configuration directory
+              mkdir -p /opt/rke
+              
+              # Install kubectl
+              curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+              chmod +x kubectl
+              mv kubectl /usr/local/bin/
+              
+              # Configure Docker daemon for RKE
+              cat > /etc/docker/daemon.json << 'DOCKEREOF'
+              {
+                "log-driver": "json-file",
+                "log-opts": {
+                  "max-size": "10m",
+                  "max-file": "3"
+                }
+              }
+              DOCKEREOF
+              
+              # Restart Docker with new configuration
+              systemctl restart docker
+              
+              # Set proper permissions
+              chown -R ec2-user:ec2-user /opt/rke
+              
+              # Create a simple web server for health checks
+              zypper install -y apache2
+              systemctl start apache2
+              systemctl enable apache2
+              echo "<h1>RKE Ready - RantzApp Cluster</h1>" > /srv/www/htdocs/index.html
               EOF
   )
 
@@ -195,9 +360,9 @@ resource "aws_launch_template" "main" {
 # Create Auto Scaling Group
 resource "aws_autoscaling_group" "main" {
   name                = "rantzapp-asg"
-  desired_capacity    = 1
-  max_size            = 2
-  min_size            = 1
+  desired_capacity    = 2
+  max_size            = 3
+  min_size            = 2
   target_group_arns   = [aws_lb_target_group.main.arn]
   vpc_zone_identifier = aws_subnet.public_subnets[*].id
 
@@ -293,4 +458,10 @@ resource "aws_lb_listener" "main" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.main.arn
   }
+}
+
+# Create a key pair
+resource "aws_key_pair" "main" {
+  key_name   = "ec2-kp"
+  public_key = file("${path.module}/ec2-kp.pub")  # You'll need the public key
 }

@@ -14,10 +14,19 @@ deploy app using manifest on vagrant - done
 deploy app using using helm and argo cd on vagrant - done
 deploy monitoring tools - prometheus, grafana, jaeger, falco, --- sentry, X loki
 
-set up infra terraform for aws using ec2 and co
+set up infra terraform for aws using ec2 and co - done
 setup app deployment to ec2
 setup monitoring deployment to ec2
 
 setup ci for infra
 setup ci for application
 setup ci for monitoring
+
+
+aws ec2 describe-instances \
+  --instance-ids $(aws autoscaling describe-auto-scaling-groups \
+    --auto-scaling-group-names rantzapp-asg \
+    --query 'AutoScalingGroups[0].Instances[*].InstanceId' \
+    --output text --region eu-west-1 --profile manager) \
+  --query 'Reservations[*].Instances[*].[InstanceId,KeyName]' \
+  --output table --region eu-west-1 --profile manager
