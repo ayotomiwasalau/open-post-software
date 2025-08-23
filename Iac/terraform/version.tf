@@ -15,8 +15,8 @@ terraform {
   }
   
   backend "s3" {
-    bucket = "s3://deploy-artifacts-aytom/terraform"
-    key    = "terraform.tfstate"
+    bucket = "deploy-artifacts-aytom"
+    key    = "terraform/terraform.tfstate"
     region = "eu-west-1"
   }
 }
