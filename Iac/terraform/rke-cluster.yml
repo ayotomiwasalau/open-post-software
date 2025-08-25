@@ -1,13 +1,13 @@
 nodes:
 # Control Plane + etcd nodes (first 2 nodes)
-- address: 18.203.153.224
-  internal_address: 10.0.3.183
+- address: 3.254.70.4
+  internal_address: 10.0.2.214
   user: ec2-user
   role: [controlplane, etcd, worker]
   ssh_key_path: ./ec2-kp.pem
 
-- address: 52.50.158.238
-  internal_address: 10.0.1.179
+- address: 52.49.172.144
+  internal_address: 10.0.3.126
   user: ec2-user
   role: [controlplane, etcd, worker]
   ssh_key_path: ./ec2-kp.pem

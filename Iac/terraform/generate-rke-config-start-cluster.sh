@@ -90,3 +90,9 @@ worker:
 EOF
 
 echo "RKE configuration generated: rke-cluster.yml" 
+
+rke up --config rke-cluster.yml --ignore-docker-version
+
+base64 -w 0 kube_config_rke-cluster.yml > kube_config_rke-cluster.yml.base64
+
+echo "Kubeconfig base64 encoded: kube_config_rke-cluster.yml.base64"
