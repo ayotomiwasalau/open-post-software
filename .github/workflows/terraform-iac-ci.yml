@@ -67,33 +67,9 @@ jobs:
       working-directory: ${{ env.TF_WORKING_DIR }}
       run: terraform apply --auto-approve tfplan
       if: github.ref == 'refs/heads/main' && github.event.inputs.action == 'apply'
-    
-    - name: Rke up
-      working-directory: ${{ env.TF_WORKING_DIR }}
-      run: |
-        wget https://github.com/rancher/rke/releases/latest/download/rke_linux-amd64   
-        mv rke_linux-amd64 rke
-        chmod +x rke
-        chmod +x ./generate-rke-config.sh
-        ./generate-rke-config.sh
-        rke up --config rke-cluster.yml --ignore-docker-version
-      if: github.ref == 'refs/heads/main' && github.event.inputs.action == 'apply'
-    
-    - name: Upload kubeconfig
-      uses: actions/upload-artifact@v4
-      with:
-        name: kubeconfig
-        path: kube_config_rke-cluster.yml
-        # retention-days: 1
         
     - name: Terraform Destroy
       working-directory: ${{ env.TF_WORKING_DIR }}
       run: terraform destroy -auto-approve
       if: github.ref == 'refs/heads/main' && github.event.inputs.action == 'destroy'
       
-    # - name: Upload Terraform Plan
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: terraform-plan
-    #     path: ${{ env.TF_WORKING_DIR }}/tfplan
-    #   # if: github.event_name == 'pull_request'
