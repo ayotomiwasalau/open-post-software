@@ -1,0 +1,60 @@
+namespace:
+  name: dev
+ 
+service:
+  port: 3111
+  targetPort: 3111
+  protocol: TCP
+  type: NodePort
+
+image:
+  repository: tomiwasalau01/appserver
+  tag: latest
+  pullPolicy: Always
+
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 64Mi
+  limits:
+    memory: "128Mi"
+    cpu: "500m"
+
+ports:
+  containerPort: 3111
+  protocol: TCP
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 3111
+  initialDelaySeconds: 5
+  timeoutSeconds: 2
+
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: 3111
+  initialDelaySeconds: 5
+  timeoutSeconds: 5
+
+database:
+  replicaCount: 1
+  port: 5432
+  image:
+    repository: tomiwasalau01/app-db
+    tag: latest
+    pullPolicy: IfNotPresent
+  storage:
+    capacity: 256Mi
+    hostPath: "/mnt/data"
+  config:
+    username: "admin"
+    name: "postgres"
+    host: "postgres"
+    port: "5432"
+  secret:
+    password: "d293aW1zb3NlY3VyZQ=="
+

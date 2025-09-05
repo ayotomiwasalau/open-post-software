@@ -30,3 +30,10 @@ aws ec2 describe-instances \
     --output text --region eu-west-1 --profile manager) \
   --query 'Reservations[*].Instances[*].[InstanceId,KeyName]' \
   --output table --region eu-west-1 --profile manager
+
+New Next steps
+- Setup up app - a doodle game
+- setup argocd in CI for app deployment
+- setup argocd in CI for prometheus
+- setup networking to access app, argo and prometheus ui
+- connect a domain name for access
